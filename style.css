@@ -1,0 +1,373 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: linear-gradient(
+        135deg,
+        #38BDF8,
+        #0891B2,
+        #0F172A
+
+
+    );
+
+    overflow-x: hidden;
+}
+
+.container {
+    width: 100%;
+    max-width: 500px;
+    padding: 25px;
+    text-align: center;
+    position: relative;
+}
+
+header {
+    animation: muncul 0.8s ease;
+}
+
+.logo {
+    font-size: 50px;
+    animation: goyang 2s infinite ease-in-out;
+}
+
+h1 {
+    color: #333;
+    font-size: 32px;
+    margin-top: 5px;
+}
+
+.subtitle {
+    color: #666;
+    margin-top: 8px;
+}
+
+.score-board {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 15px;
+    margin: 25px 0;
+}
+
+.player {
+    background: rgba(255,255,255,0.8);
+    padding: 15px;
+    border-radius: 20px;
+
+    width: 120px;
+
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+
+    transition: 0.3s;
+}
+
+.player:hover {
+    transform: translateY(-5px) rotate(2deg);
+}
+
+.player span {
+    font-size: 30px;
+}
+
+.player p {
+    font-size: 13px;
+    margin: 5px 0;
+    color: #666;
+}
+
+.player strong {
+    font-size: 25px;
+}
+
+.vs {
+    font-weight: bold;
+    color: #555;
+}
+
+.status {
+    display: inline-block;
+
+    padding: 10px 20px;
+    margin-bottom: 20px;
+
+    background: white;
+    border-radius: 50px;
+
+    font-weight: bold;
+
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+
+    animation: pulse 1.5s infinite;
+}
+
+.game-board {
+    width: 320px;
+    max-width: 100%;
+
+    margin: auto;
+
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.cell {
+    aspect-ratio: 1;
+
+    border: none;
+    border-radius: 20px;
+
+    background: rgba(255,255,255,0.85);
+
+    font-size: 55px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 15px rgba(0,0,0,0.12);
+
+    transition:
+        transform 0.2s,
+        background 0.2s;
+}
+
+.cell:hover {
+    transform: scale(1.05) rotate(2deg);
+    background: white;
+}
+
+.cell:active {
+    transform: scale(0.9);
+}
+
+.cell.x {
+    animation: pop 0.35s ease;
+}
+
+.cell.o {
+    animation: pop 0.35s ease;
+}
+
+.reset-button {
+    margin-top: 25px;
+
+    border: none;
+    border-radius: 50px;
+
+    padding: 13px 25px;
+
+    background: #333;
+    color: white;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.reset-button:hover {
+    transform: scale(1.08);
+}
+
+.footer {
+    margin-top: 20px;
+    color: #777;
+    font-size: 13px;
+}
+
+/* EMOJI TERBANG */
+
+.floating {
+    position: fixed;
+
+    font-size: 25px;
+
+    animation: terbang 5s infinite ease-in-out;
+
+    opacity: 0.7;
+}
+
+.floating:nth-child(1) {
+    top: 10%;
+    left: 10%;
+}
+
+.floating:nth-child(2) {
+    top: 20%;
+    right: 10%;
+    animation-delay: 1s;
+}
+
+.floating:nth-child(3) {
+    bottom: 15%;
+    left: 12%;
+    animation-delay: 2s;
+}
+
+.floating:nth-child(4) {
+    bottom: 20%;
+    right: 12%;
+    animation-delay: 3s;
+}
+
+/* POPUP MENANG */
+
+.win-popup {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0,0,0,0.45);
+
+    display: none;
+
+    justify-content: center;
+    align-items: center;
+
+    padding: 20px;
+
+    z-index: 10;
+}
+
+.win-popup.show {
+    display: flex;
+    animation: muncul 0.3s ease;
+}
+
+.popup-box {
+    background: white;
+
+    width: 100%;
+    max-width: 350px;
+
+    padding: 35px 25px;
+
+    text-align: center;
+
+    border-radius: 30px;
+
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+
+    animation: loncat 0.5s ease;
+}
+
+.confetti {
+    font-size: 60px;
+
+    animation: muter 1s infinite;
+}
+
+.popup-box h2 {
+    margin: 10px 0;
+}
+
+.popup-box p {
+    color: #777;
+    margin-bottom: 20px;
+}
+
+#nextButton {
+    border: none;
+    border-radius: 50px;
+
+    padding: 12px 25px;
+
+    background: #333;
+    color: white;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+/* ANIMASI */
+
+@keyframes muncul {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pop {
+    0% {
+        transform: scale(0);
+    }
+
+    70% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes pulse {
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes goyang {
+    0%, 100% {
+        transform: rotate(-5deg);
+    }
+
+    50% {
+        transform: rotate(5deg);
+    }
+}
+
+@keyframes terbang {
+    0%, 100% {
+        transform: translateY(0) rotate(0);
+    }
+
+    50% {
+        transform: translateY(-25px) rotate(15deg);
+    }
+}
+
+@keyframes loncat {
+    0% {
+        transform: scale(0.5);
+    }
+
+    70% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes muter {
+    from {
+        transform: rotate(0deg) scale(1);
+    }
+
+    to {
+        transform: rotate(360deg) scale(1.1);
+    }
+}
