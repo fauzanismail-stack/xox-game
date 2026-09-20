@@ -1,12 +1,20 @@
-const cells = document.querySelectorAll(".cell");
+const cells =
+    document.querySelectorAll(".cell");
 
-const status = document.getElementById("status");
+const status =
+    document.getElementById("status");
 
-const scoreX = document.getElementById("scoreX");
-const scoreO = document.getElementById("scoreO");
+const scoreX =
+    document.getElementById("scoreX");
+
+const scoreO =
+    document.getElementById("scoreO");
 
 const resetButton =
     document.getElementById("resetButton");
+
+const soundButton =
+    document.getElementById("soundButton");
 
 const winPopup =
     document.getElementById("winPopup");
@@ -14,13 +22,39 @@ const winPopup =
 const winnerText =
     document.getElementById("winnerText");
 
+const popupMessage =
+    document.getElementById("popupMessage");
+
 const nextButton =
     document.getElementById("nextButton");
+
+const playerMode =
+    document.getElementById("playerMode");
+
+const aiMode =
+    document.getElementById("aiMode");
+
+const nameO =
+    document.getElementById("nameO");
+
+const leaderX =
+    document.getElementById("leaderX");
+
+const leaderO =
+    document.getElementById("leaderO");
+
+const clearLeaderboard =
+    document.getElementById("clearLeaderboard");
 
 
 let currentPlayer = "X";
 
 let gameActive = true;
+
+let vsAI = false;
+
+let soundOn = true;
+
 
 let score = {
     X: 0,
@@ -28,82 +62,313 @@ let score = {
 };
 
 
+// ========================
+// LEADERBOARD
+// ========================
+
+let leaderboard =
+    JSON.parse(
+        localStorage.getItem(
+            "xoxLeaderboard"
+        )
+    ) || {
+        X: 0,
+        O: 0
+    };
+
+
+function updateLeaderboard() {
+
+    leaderX.textContent =
+        leaderboard.X;
+
+    leaderO.textContent =
+        leaderboard.O;
+
+}
+
+
+updateLeaderboard();
+
+
+// ========================
+// SOUND
+// ========================
+
+const audioContext =
+    new (
+        window.AudioContext ||
+        window.webkitAudioContext
+    )();
+
+
+function playSound(
+    frequency,
+    duration = 0.12
+) {
+
+    if (!soundOn) return;
+
+    if (
+        audioContext.state ===
+        "suspended"
+    ) {
+        audioContext.resume();
+    }
+
+
+    const oscillator =
+        audioContext.createOscillator();
+
+    const gain =
+        audioContext.createGain();
+
+
+    oscillator.connect(gain);
+
+    gain.connect(
+        audioContext.destination
+    );
+
+
+    oscillator.frequency.value =
+        frequency;
+
+    oscillator.type =
+        "sine";
+
+
+    gain.gain.setValueAtTime(
+        0.08,
+        audioContext.currentTime
+    );
+
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.001,
+        audioContext.currentTime +
+        duration
+    );
+
+
+    oscillator.start();
+
+    oscillator.stop(
+        audioContext.currentTime +
+        duration
+    );
+
+}
+
+
+function winSound() {
+
+    playSound(600,.12);
+
+    setTimeout(
+        () => playSound(800,.12),
+        120
+    );
+
+    setTimeout(
+        () => playSound(1000,.2),
+        240
+    );
+
+}
+
+
+// ========================
+// WIN PATTERN
+// ========================
+
 const winPatterns = [
 
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
+    [0,1,2],
+    [3,4,5],
+    [6,7,8],
 
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
+    [0,3,6],
+    [1,4,7],
+    [2,5,8],
 
-    [0, 4, 8],
-    [2, 4, 6]
+    [0,4,8],
+    [2,4,6]
 
 ];
 
 
-cells.forEach((cell,index1) => {
+// ========================
+// PLAYER MOVE
+// ========================
 
-    cell.addEventListener("click", () => {
+cells.forEach(
+    (cell,index) => {
 
-        if (
-            cell.textContent !== "" ||
-            !gameActive
-        ) {
-            return;
+    cell.addEventListener(
+        "click",
+        () => {
+
+            if (
+                !gameActive ||
+                cell.textContent !== ""
+            ) {
+                return;
+            }
+
+
+            if (
+                vsAI &&
+                currentPlayer === "O"
+            ) {
+                return;
+            }
+
+
+            makeMove(
+                index,
+                currentPlayer
+            );
+
+
+            if (
+                gameActive &&
+                vsAI &&
+                currentPlayer === "O"
+            ) {
+
+                setTimeout(
+                    aiMove,
+                    400
+                );
+
+            }
+
         }
-
-
-        if (currentPlayer === "X") {
-
-            cell.textContent = "❌";
-            cell.classList.add("x");
-
-        } else {
-
-            cell.textContent = "⭕";
-            cell.classList.add("o");
-
-        }
-
-
-        checkWinner();
-
-    });
+    );
 
 });
 
 
-function checkWinner() {
+// ========================
+// MAKE MOVE
+// ========================
 
-    for (let pattern of winPatterns) {
+function makeMove(
+    index,
+    player
+) {
 
-        const a = cells[pattern[0]].textContent;
-        const b = cells[pattern[1]].textContent;
-        const c = cells[pattern[2]].textContent;
+    const cell =
+        cells[index];
+
+
+    if (
+        cell.textContent !== ""
+    ) {
+        return;
+    }
+
+
+    if (player === "X") {
+
+        cell.textContent = "❌";
+
+        cell.classList.add("x");
+
+    } else {
+
+        cell.textContent = "⭕";
+
+        cell.classList.add("o");
+
+    }
+
+
+    playSound(
+        player === "X"
+            ? 500
+            : 700
+    );
+
+
+    checkWinner(player);
+
+}
+
+
+// ========================
+// CHECK WINNER
+// ========================
+
+function checkWinner(
+    player
+) {
+
+    for (
+        const pattern
+        of winPatterns
+    ) {
+
+        const [
+            a,
+            b,
+            c
+        ] = pattern;
 
 
         if (
-            a !== "" &&
-            a === b &&
-            b === c
+
+            cells[a].textContent !== "" &&
+
+            cells[a].textContent ===
+            cells[b].textContent &&
+
+            cells[b].textContent ===
+            cells[c].textContent
+
         ) {
 
             gameActive = false;
 
-            const winner =
-                currentPlayer;
+
+            score[player]++;
 
 
-            score[winner]++;
+            if (player === "X") {
 
-            updateScore();
+                scoreX.textContent =
+                    score.X;
 
-            showWinner(winner);
+            } else {
 
-            return;
+                scoreO.textContent =
+                    score.O;
+
+            }
+
+
+            leaderboard[player]++;
+
+
+            localStorage.setItem(
+                "xoxLeaderboard",
+                JSON.stringify(
+                    leaderboard
+                )
+            );
+
+
+            updateLeaderboard();
+
+
+            winSound();
+
+
+            showWinner(player);
+
+
+            return true;
         }
 
     }
@@ -111,7 +376,8 @@ function checkWinner() {
 
     const draw =
         [...cells].every(
-            cell => cell.textContent !== ""
+            cell =>
+                cell.textContent !== ""
         );
 
 
@@ -120,28 +386,42 @@ function checkWinner() {
         gameActive = false;
 
         status.textContent =
-            " Yahh seri!";
+            "🤝 HASILNYA SERI!";
 
-        setTimeout(() => {
+        playSound(300,.3);
 
-            winPopup.classList.add("show");
 
-            winnerText.textContent =
-                " HASILNYA SERI!";
+        setTimeout(
+            () => {
 
-        }, 400);
+                winnerText.textContent =
+                    "🤝 HASILNYA SERI!";
 
-        return;
+                popupMessage.textContent =
+                    "GG! Kalian sama kuat 🔥";
+
+                winPopup.classList.add(
+                    "show"
+                );
+
+            },
+            400
+        );
+
+
+        return true;
     }
 
 
     currentPlayer =
-        currentPlayer === "X"
+        player === "X"
             ? "O"
             : "X";
 
 
-    if (currentPlayer === "X") {
+    if (
+        currentPlayer === "X"
+    ) {
 
         status.textContent =
             "Giliran ❌";
@@ -149,14 +429,193 @@ function checkWinner() {
     } else {
 
         status.textContent =
-            "Giliran ⭕";
+            vsAI
+                ? "🤖 AI sedang berpikir..."
+                : "Giliran ⭕";
 
     }
+
+
+    return false;
+}
+
+
+// ========================
+// 🤖 AI
+// ========================
+
+function aiMove() {
+
+    if (
+        !gameActive ||
+        !vsAI
+    ) {
+        return;
+    }
+
+
+    let emptyCells = [];
+
+
+    cells.forEach(
+        (cell,index) => {
+
+        if (
+            cell.textContent === ""
+        ) {
+
+            emptyCells.push(index);
+
+        }
+
+    });
+
+
+    if (
+        emptyCells.length === 0
+    ) {
+        return;
+    }
+
+
+    // AI coba menang
+
+    for (
+        let index
+        of emptyCells
+    ) {
+
+        if (
+            canWin(index,"⭕")
+        ) {
+
+            makeMove(
+                index,
+                "O"
+            );
+
+            return;
+        }
+
+    }
+
+
+    // AI blok player
+
+    for (
+        let index
+        of emptyCells
+    ) {
+
+        if (
+            canWin(index,"❌")
+        ) {
+
+            makeMove(
+                index,
+                "O"
+            );
+
+            return;
+        }
+
+    }
+
+
+    // Ambil tengah
+
+    if (
+        cells[4].textContent === ""
+    ) {
+
+        makeMove(
+            4,
+            "O"
+        );
+
+        return;
+    }
+
+
+    // Random
+
+    const randomIndex =
+        emptyCells[
+            Math.floor(
+                Math.random() *
+                emptyCells.length
+            )
+        ];
+
+
+    makeMove(
+        randomIndex,
+        "O"
+    );
 
 }
 
 
-function showWinner(winner) {
+// ========================
+// AI CHECK
+// ========================
+
+function canWin(
+    index,
+    symbol
+) {
+
+    const old =
+        cells[index].textContent;
+
+
+    cells[index].textContent =
+        symbol;
+
+
+    const win =
+        winPatterns.some(
+            pattern => {
+
+                const [
+                    a,
+                    b,
+                    c
+                ] = pattern;
+
+
+                return (
+
+                    cells[a].textContent ===
+                    symbol &&
+
+                    cells[b].textContent ===
+                    symbol &&
+
+                    cells[c].textContent ===
+                    symbol
+
+                );
+
+            }
+        );
+
+
+    cells[index].textContent =
+        old;
+
+
+    return win;
+}
+
+
+// ========================
+// POPUP
+// ========================
+
+function showWinner(
+    winner
+) {
 
     status.textContent =
         `🎉 ${winner} MENANG!`;
@@ -164,33 +623,42 @@ function showWinner(winner) {
 
     winnerText.textContent =
         winner === "X"
-            ? "❌ Player X Menang!"
-            : "⭕ Player O Menang!";
+            ? "❌ PLAYER X MENANG!"
+            : vsAI
+                ? "🤖 AI MENANG!"
+                : "⭕ PLAYER O MENANG!";
 
 
-    setTimeout(() => {
+    popupMessage.textContent =
+        winner === "X"
+            ? "GOKIL! Lu menang 🔥"
+            : vsAI
+                ? "WADUH AI MENANG 😭"
+                : "GG! Player O menang 🔥";
 
-        winPopup.classList.add("show");
 
-    }, 500);
+    setTimeout(
+        () => {
+
+            winPopup.classList.add(
+                "show"
+            );
+
+        },
+        500
+    );
 
 }
 
 
-function updateScore() {
-
-    scoreX.textContent =
-        score.X;
-
-    scoreO.textContent =
-        score.O;
-
-}
-
+// ========================
+// RESET
+// ========================
 
 function resetGame() {
 
-    cells.forEach(cell => {
+    cells.forEach(
+        cell => {
 
         cell.textContent = "";
 
@@ -213,8 +681,68 @@ function resetGame() {
         "show"
     );
 
+
+    playSound(
+        400,
+        .15
+    );
+
 }
 
+
+// ========================
+// MODE
+// ========================
+
+playerMode.addEventListener(
+    "click",
+    () => {
+
+        vsAI = false;
+
+        playerMode.classList.add(
+            "active"
+        );
+
+        aiMode.classList.remove(
+            "active"
+        );
+
+        nameO.textContent =
+            "Player O";
+
+        resetGame();
+
+    }
+);
+
+
+aiMode.addEventListener(
+    "click",
+    () => {
+
+        vsAI = true;
+
+        aiMode.classList.add(
+            "active"
+        );
+
+        playerMode.classList.remove(
+            "active"
+        );
+
+        nameO.textContent =
+            "🤖 AI";
+
+        resetGame();
+
+    }
+);
+
+
+// ========================
+// BUTTON
+// ========================
 
 resetButton.addEventListener(
     "click",
@@ -225,4 +753,49 @@ resetButton.addEventListener(
 nextButton.addEventListener(
     "click",
     resetGame
+);
+
+
+soundButton.addEventListener(
+    "click",
+    () => {
+
+        soundOn =
+            !soundOn;
+
+
+        soundButton.textContent =
+            soundOn
+                ? "🔊 Sound ON"
+                : "🔇 Sound OFF";
+
+    }
+);
+
+
+clearLeaderboard.addEventListener(
+    "click",
+    () => {
+
+        leaderboard = {
+            X: 0,
+            O: 0
+        };
+
+
+        localStorage.setItem(
+            "xoxLeaderboard",
+            JSON.stringify(
+                leaderboard
+            )
+        );
+
+
+        updateLeaderboard();
+
+        playSound(
+            300
+        );
+
+    }
 );
