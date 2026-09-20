@@ -4,103 +4,194 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>XOX ARENA🔥</title>
+    <title>XOX ARENA 🔥</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <div class="container">
+<div class="background">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+</div>
 
-        <div class="floating">🌟</div>
-        <div class="floating">🏆</div>
-        <div class="floating">🏅</div>
-        <div class="floating">🎮</div>
+<div class="container">
 
-        <header>
-            <div class="logo">❌⭕❌</div>
+    <header>
+        <div class="logo">❌⭕❌</div>
 
-            <h1>!XOX RUSH!</h1>
+        <h1>XOX ARENA</h1>
 
-            <p class="subtitle">
-                JANGAN SAMPE KALAH!
-            </p>
-        </header>
+        <p class="subtitle">
+            JANGAN SAMPE KALAH!
+        </p>
+    </header>
 
-        <section class="score-board">
 
-            <div class="player x-player">
-                <span>❌</span>
-                <p>Player X</p>
-                <strong id="scoreX">0</strong>
-            </div>
+    <!-- MODE -->
 
-            <div class="vs">
-                VS
-            </div>
+    <div class="mode-box">
 
-            <div class="player o-player">
-                <span>⭕</span>
-                <p>Player O</p>
-                <strong id="scoreO">0</strong>
-            </div>
-
-        </section>
-
-        <div class="status" id="status">
-            Giliran ❌
-        </div>
-
-        <main class="game-board" id="gameBoard">
-
-            <button class="cell"></button>
-            <button class="cell"></button>
-            <button class="cell"></button>
-
-            <button class="cell"></button>
-            <button class="cell"></button>
-            <button class="cell"></button>
-
-            <button class="cell"></button>
-            <button class="cell"></button>
-            <button class="cell"></button>
-
-        </main>
-
-        <button class="reset-button" id="resetButton">
-            🔄 Ulang lagi
+        <button id="playerMode" class="mode active">
+            👥 2 PLAYER
         </button>
 
-        <p class="footer">
-            Buatan ojan & AI 
-        </p>
+        <button id="aiMode" class="mode">
+            🤖 LAWAN AI
+        </button>
 
     </div>
 
-    <div class="win-popup" id="winPopup">
 
-        <div class="popup-box">
+    <!-- SCORE -->
 
-            <div class="confetti">🎉</div>
+    <section class="score-board">
 
-            <h2 id="winnerText">
-                Player X Menang!
-            </h2>
+        <div class="player x-player">
 
-            <p>
-                YEAYY KAMU MENANG🏆
+            <span>❌</span>
+
+            <p id="nameX">
+                Player X
             </p>
 
-            <button id="nextButton">
-                Lanjutin dong 
-            </button>
+            <strong id="scoreX">
+                0
+            </strong>
 
         </div>
 
+
+        <div class="vs">
+            VS
+        </div>
+
+
+        <div class="player o-player">
+
+            <span>⭕</span>
+
+            <p id="nameO">
+                Player O
+            </p>
+
+            <strong id="scoreO">
+                0
+            </strong>
+
+        </div>
+
+    </section>
+
+
+    <div class="status" id="status">
+        Giliran ❌
     </div>
 
-    <script src="script.js"></script>
+
+    <!-- GAME -->
+
+    <main class="game-board">
+
+        <button class="cell"></button>
+        <button class="cell"></button>
+        <button class="cell"></button>
+
+        <button class="cell"></button>
+        <button class="cell"></button>
+        <button class="cell"></button>
+
+        <button class="cell"></button>
+        <button class="cell"></button>
+        <button class="cell"></button>
+
+    </main>
+
+
+    <!-- BUTTON -->
+
+    <div class="buttons">
+
+        <button class="reset-button" id="resetButton">
+            🔄 Ulang
+        </button>
+
+        <button class="reset-button" id="soundButton">
+            🔊 Sound ON
+        </button>
+
+    </div>
+
+
+    <!-- LEADERBOARD -->
+
+    <div class="leaderboard">
+
+        <h2>🏆 LEADERBOARD</h2>
+
+        <div class="leader-row">
+
+            <span>❌ X</span>
+
+            <strong id="leaderX">
+                0
+            </strong>
+
+        </div>
+
+        <div class="leader-row">
+
+            <span>⭕ O</span>
+
+            <strong id="leaderO">
+                0
+            </strong>
+
+        </div>
+
+        <button id="clearLeaderboard">
+            Reset Leaderboard
+        </button>
+
+    </div>
+
+
+    <p class="footer">
+        Buatan ojan & AI 🤖
+    </p>
+
+</div>
+
+
+<!-- POPUP -->
+
+<div class="win-popup" id="winPopup">
+
+    <div class="popup-box">
+
+        <div class="confetti">
+            🎉
+        </div>
+
+        <h2 id="winnerText">
+            Player X Menang
+        </h2>
+
+        <p id="popupMessage">
+            keren Permainan selesai 🔥
+        </p>
+
+        <button id="nextButton">
+            Lanjutin 🔥
+        </button>
+
+    </div>
+
+</div>
+
+
+<script src="script.js"></script>
 
 </body>
 </html>
